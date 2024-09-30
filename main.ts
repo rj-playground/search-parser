@@ -3,17 +3,12 @@ import 'npm:@kusto/language-service-next';
 import ast from 'npm:@pgsql/utils'
 import { deparse } from 'npm:pgsql-deparser';
 
-import { TextLineStream } from "jsr:@std/streams@0.223.0/text-line-stream";
-
-
-//import readline from 'node:readline';
-//import { stdin as input, stdout as output, stdin, stdout } from 'node:process';
+import { ReadLine } from "./readline.ts";
 
 import * as assert from "node:assert";
 
 import K = Kusto.Language 
 import KustoType = K.Syntax.SyntaxKind
-import { exit, stdout } from "node:process";
 
 const selectStarTargetList = [
     ast.default.resTarget({
@@ -293,15 +288,6 @@ class ReadLineStream extends TransformStream<string, string> {
     
 }
 
-// Iterator
-async function *nextLine() {
-    const enc = (s: string) => new TextEncoder().encode(s);
-
-    Deno.stdout.write(enc("query> "))
-    
-    yield (await Deno.stdin.readable.pipeThrough(new TextDecoderStream()).pipeThrough(new ReadLineStream()).getReader().read()).value!
-}
-
 //const query = "T |  join kind=inner (Z) on a | join kind=inner (Y) on z | where a > 10.0"
 
 let t1 = Kusto.Language.Symbols.TableSymbol.From("(a: real, b: real)")
@@ -348,143 +334,7 @@ function processLine(line: string): string {
     return ""
 }
 
-Deno.stdin.setRaw(true)
+const readLine = new ReadLine(processLine, "PROMPT> ")
 
-
-const encoder = new TextEncoder();
-const PROMPT = encoder.encode("PROMPT>")
-
-const currentLine = new Uint8Array(10240)
-const ctrlLetters = new Uint8Array(10)
-ctrlLetters[0] = 13
-ctrlLetters[1] = 10
-
-const CARRIAGE_RETURN = ctrlLetters.slice(0,1)
-const NEW_LINE = ctrlLetters.slice(0,2)
-
-ctrlLetters[2] = 27
-ctrlLetters[3] = 91
-ctrlLetters[4] = 68
-
-const CNTRL_LEFT_KEY = ctrlLetters.slice(2,5)
-
-ctrlLetters[5] = 32
-const SPACE = ctrlLetters.slice(5,6)
-
-
-const LEFT_SEQUENCE = [27,91,68]
-const UP_SEQUENCE = [27, 91, 65]
-const RIGHT_SEQUENCE = [27, 91, 67]
-
-let currentPosition = 0;
-let leftSequencePostion = 0; 
-let upSequencePostion = 0; 
-let rightSequencePostion = 0; 
-
-const history: Uint8Array[] = []
-let historicalLine = 0
-
-const transform = new TransformStream({
-    
-    transform: (chunk: Uint8Array, controller) => {
-        let cntrl = false
-
-        for(const unit of chunk) {
-            if(unit === 3) {
-                exit(-1)
-            }
-
-            if(unit === LEFT_SEQUENCE[leftSequencePostion]) {
-                ++leftSequencePostion
-                cntrl = true
-            } else {
-                leftSequencePostion = 0
-            }
- 
-            if(unit === UP_SEQUENCE[upSequencePostion]) {
-                ++upSequencePostion
-                cntrl = true
-            } else {
-                upSequencePostion = 0
-            }
-
-            if(unit === RIGHT_SEQUENCE[rightSequencePostion]) {
-                ++rightSequencePostion
-                cntrl = true
-            } else {
-                rightSequencePostion = 0
-            }
-
-            if(leftSequencePostion === 3 || unit === 127 /* DEL */) {
-                cntrl = true // in case of DEL
-                leftSequencePostion = 0
-                if(currentPosition > 0) {
-                    currentPosition -= 1
-                    controller.enqueue(CNTRL_LEFT_KEY)
-                    controller.enqueue(SPACE)
-                    controller.enqueue(CARRIAGE_RETURN)
-                    controller.enqueue(PROMPT)
-                    const lineEncoded = currentLine.slice(0, currentPosition)
-                    controller.enqueue(lineEncoded)
-                }
-            }
-
-            if(upSequencePostion == 3) {
-                --historicalLine
-                
-                controller.enqueue(CARRIAGE_RETURN)
-                for(let i=0; i < PROMPT.length+currentPosition; ++i) {
-                    controller.enqueue(SPACE)
-                }
-                controller.enqueue(CARRIAGE_RETURN)
-                controller.enqueue(PROMPT)
-
-                if(history.length+historicalLine >= 0) {
-                    currentLine.set(history[history.length+historicalLine])
-                    
-                    currentPosition = history[history.length+historicalLine].length
-
-                    controller.enqueue(currentLine.slice(0, currentPosition))
-                } else {
-                    currentPosition = 0
-                }
-
-                upSequencePostion = 0
-            }
-
-            if(cntrl) {
-                cntrl = false
-                continue
-            }
-            
-            if (unit === 13 ) {
-                controller.enqueue(NEW_LINE)
-
-                const lineEncoded = currentLine.slice(0, currentPosition)
-                historicalLine=0
-                history.push(lineEncoded)
-
-                const decoder = new TextDecoder();
-                const line = decoder.decode(lineEncoded)
-                currentPosition = 0
-
-                const output = processLine(line)
-                const outputEncoded = encoder.encode(output)
-                
-                controller.enqueue(outputEncoded)
-                controller.enqueue(NEW_LINE)
-                controller.enqueue(PROMPT)
-
-                continue
-            } else {
-                currentLine.set(chunk, currentPosition)
-                currentPosition += chunk.length
-            }
-
-            controller.enqueue(chunk)
-        }        
-    }
-})
-
-Deno.stdout.write(PROMPT)
-Deno.stdin.readable.pipeThrough(transform).pipeTo(Deno.stdout.writable)
+Deno.stdout.write(readLine.PROMPT)
+Deno.stdin.readable.pipeThrough(readLine).pipeTo(Deno.stdout.writable)
