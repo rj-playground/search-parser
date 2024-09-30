@@ -39,7 +39,11 @@ function processLine(line: string): string {
     
             return `output: ${deparse(sqlTree, {})}`    
         } catch(ex) {
-            return JSON.stringify(ex)
+            if(ex.message !== undefined) {
+                return ex.toString() 
+            } else {
+                return JSON.stringify(ex)
+            }
         }
     } else if (keyword === "parse" || keyword === "p") {
         const parsed = K.KustoCode.ParseAndAnalyze(query, globalState)
