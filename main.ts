@@ -381,6 +381,9 @@ let leftSequencePostion = 0;
 let upSequencePostion = 0; 
 let rightSequencePostion = 0; 
 
+const history: Uint8Array[] = []
+let historicalLine = 0
+
 const transform = new TransformStream({
     
     transform: (chunk: Uint8Array, controller) => {
@@ -427,6 +430,8 @@ const transform = new TransformStream({
             }
 
             if(upSequencePostion == 3) {
+                --historicalLine
+                
                 controller.enqueue(CARRIAGE_RETURN)
                 for(let i=0; i < PROMPT.length+currentPosition; ++i) {
                     controller.enqueue(SPACE)
@@ -434,8 +439,17 @@ const transform = new TransformStream({
                 controller.enqueue(CARRIAGE_RETURN)
                 controller.enqueue(PROMPT)
 
+                if(history.length+historicalLine >= 0) {
+                    currentLine.set(history[history.length+historicalLine])
+                    
+                    currentPosition = history[history.length+historicalLine].length
+
+                    controller.enqueue(currentLine.slice(0, currentPosition))
+                } else {
+                    currentPosition = 0
+                }
+
                 upSequencePostion = 0
-                currentPosition = 0
             }
 
             if(cntrl) {
@@ -447,6 +461,8 @@ const transform = new TransformStream({
                 controller.enqueue(NEW_LINE)
 
                 const lineEncoded = currentLine.slice(0, currentPosition)
+                historicalLine=0
+                history.push(lineEncoded)
 
                 const decoder = new TextDecoder();
                 const line = decoder.decode(lineEncoded)
