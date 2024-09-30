@@ -1,0 +1,53 @@
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:@kusto/language-service-next": "npm:@kusto/language-service-next@11.7.0",
+      "npm:@pgsql/utils": "npm:@pgsql/utils@13.10.1",
+      "npm:bridge.net": "npm:bridge.net@2.0.0",
+      "npm:pgsql-deparser": "npm:pgsql-deparser@13.15.0"
+    },
+    "npm": {
+      "@kusto/language-service-next@11.7.0": {
+        "integrity": "sha512-7m/COvVmcNdwCxwsoJFa18w9NMPJCAEyLFb7yzb4cUOUAhAo5yzmlSAezrTx7eTaBQpAdvFE6Eo7NuisakNqLQ==",
+        "dependencies": {}
+      },
+      "@pgsql/types@13.9.0": {
+        "integrity": "sha512-R26mn0zMkwfR8imEQ1Q4NedHwG9gTUfgVnLJUBqPn33JyhOUi2H6iEVTcC9kHAm7gQGpwSBKfuCItWgenAlm9g==",
+        "dependencies": {}
+      },
+      "@pgsql/utils@13.10.1": {
+        "integrity": "sha512-sBYMJtFlCqbBHSxw7p3ttIdoZQ045rC3Ei5Y+8yLuGN7oqkFVM2c/mzgUltayl7WD8APg+LID99vwBy7r1GiSw==",
+        "dependencies": {
+          "@pgsql/types": "@pgsql/types@13.9.0",
+          "nested-obj": "nested-obj@0.0.1"
+        }
+      },
+      "bridge.net@2.0.0": {
+        "integrity": "sha512-DZCQ+whr07CpFCrHS02Njme+uvz+dNRt1K+eCXdZNuCSvIt+qlNHxelzeer1yxD5eW8q4pBHueUJ5o+uryyBYw==",
+        "dependencies": {}
+      },
+      "dotty@0.1.2": {
+        "integrity": "sha512-V0EWmKeH3DEhMwAZ+8ZB2Ao4OK6p++Z0hsDtZq3N0+0ZMVqkzrcEGROvOnZpLnvBg5PTNG23JEDLAm64gPaotQ==",
+        "dependencies": {}
+      },
+      "nested-obj@0.0.1": {
+        "integrity": "sha512-kB1WKTng+IePQhZVs1UXtFaHBx4QEM5a0XKGAzYfCKvdx5DhNjCytNDWMUGpNNpHLotln+tiwcA52kWCIgGq1Q==",
+        "dependencies": {}
+      },
+      "pgsql-deparser@13.15.0": {
+        "integrity": "sha512-6d4YeDE/y+AZ/C4tlzTrFwbOqDW4ma/jvYlXRgXYVdPU2WF5IQISksIQ8uhNMXW7QxL/4gw0bzLhRNwckf3t/Q==",
+        "dependencies": {
+          "@pgsql/types": "@pgsql/types@13.9.0",
+          "dotty": "dotty@0.1.2",
+          "pgsql-enums": "pgsql-enums@13.10.0"
+        }
+      },
+      "pgsql-enums@13.10.0": {
+        "integrity": "sha512-L0vO9RwwPENvB07YlIVTnRu3JMnmjHQhxWR2NQbHOUPIpfF6khhfv+OC51By2ATts3jfZRSi8TLjNf9O6rP9iA==",
+        "dependencies": {}
+      }
+    }
+  },
+  "remote": {}
+}
