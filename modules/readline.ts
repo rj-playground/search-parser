@@ -37,7 +37,7 @@ function transform(readline: ReadLine, chunk: Uint8Array, controller: TransformS
         }
 
         if(unit === LEFT_SEQUENCE[readline.state.leftSequencePostion]) {
-            ++readline.state.leftSequencePostion
+            readline.state.leftSequencePostion += 1
             cntrl = true
         } else {
             readline.state.leftSequencePostion = 0
@@ -58,7 +58,6 @@ function transform(readline: ReadLine, chunk: Uint8Array, controller: TransformS
         }
 
         if(readline.state.leftSequencePostion === 3 || unit === 127 /* DEL */) {
-            cntrl = true // in case of DEL
             readline.state.leftSequencePostion = 0
             if(readline.state.currentPosition > 0) {
                 readline.state.currentPosition -= 1
@@ -69,6 +68,7 @@ function transform(readline: ReadLine, chunk: Uint8Array, controller: TransformS
                 const lineEncoded = currentLine.slice(0, readline.state.currentPosition)
                 controller.enqueue(lineEncoded)
             }
+            return // TODO: don't reset state on cntrl input -- this can make piped input incorrect
         }
 
         if(readline.state.upSequencePostion == 3) {
@@ -92,6 +92,7 @@ function transform(readline: ReadLine, chunk: Uint8Array, controller: TransformS
             }
 
             readline.state.upSequencePostion = 0
+            return // TODO: don't reset state on cntrl input -- this can make piped input incorrect
         }
 
         if(cntrl) {
@@ -117,14 +118,13 @@ function transform(readline: ReadLine, chunk: Uint8Array, controller: TransformS
             controller.enqueue(NEW_LINE)
             controller.enqueue(readline.PROMPT)
 
-            continue
-        } else {
-            currentLine.set(chunk, readline.state.currentPosition)
-            readline.state.currentPosition += chunk.length
-        }
+            return  // TODO: don't reset state on cntrl input -- this can make piped input incorrect
+        } 
+    }
 
-        controller.enqueue(chunk)
-    }        
+    currentLine.set(chunk, readline.state.currentPosition)
+    readline.state.currentPosition += chunk.length
+    controller.enqueue(chunk)
 }
 
 type ReadLineState = {
