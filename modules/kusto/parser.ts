@@ -8,6 +8,7 @@ import * as assert from "node:assert";
 import K = Kusto.Language 
 import KustoType = K.Syntax.SyntaxKind
 
+
 const selectStarTargetList = [
     ast.default.resTarget({
         val: ast.default.columnRef({
@@ -229,7 +230,7 @@ export function transformKustoToSql(knode: K.Syntax.SyntaxNode | K.Syntax.Syntax
     } else if(knode.Kind === KustoType.JoinOperator) {
         return transformJoin(knode as K.Syntax.JoinOperator)
     } else if(knode.Kind === KustoType.FilterOperator) {
-        return transformFilter(knode as K.Syntax.FilterOperator)
+        return transformFilter(knode as K.Syntax.FilterOperator) as ast.A_Expr
     }
 
     throw {msg: `Not Implemented. Node Kind ${syntaxNames[knode.Kind]}`} as ParseError

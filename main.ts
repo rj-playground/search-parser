@@ -1,6 +1,7 @@
 
 import { printKustoTree, transformKustoToSql } from "./modules/kusto.ts";
 import { ReadLine } from "./modules/readline.ts";
+import { PGlite } from "@electric-sql/pglite";
 
 import { deparse } from 'npm:pgsql-deparser';
 
@@ -17,15 +18,19 @@ t1 = t1?.WithName("T")!
 let t2 = Kusto.Language.Symbols.TableSymbol.From("(a: real, b: real)")
 t2 = t2?.WithName("Z")!
 
-const db = new Kusto.Language.Symbols.DatabaseSymbol.$ctor2("db", null, [t1, t2]);
+const _db = new Kusto.Language.Symbols.DatabaseSymbol.$ctor2("db", null, [t1, t2]);
 
-const globalState = Kusto.Language.GlobalState.Default?.WithDatabase(db);
+const globalState = Kusto.Language.GlobalState.Default?.WithDatabase(_db);
+
+const pgdb = new PGlite();
 
 function processLine(line: string): string {
     const [keyword, ...queryParts] = line.split(" ")
     const query = queryParts.join(" ")
 
     if(keyword === "quit" || keyword === "q") {
+      
+
         Deno.exit(0)
     } else if(keyword === "translate" || keyword === "t") {
         try {
