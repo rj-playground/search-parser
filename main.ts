@@ -1,7 +1,7 @@
 
 import { printKustoTree, transformKustoToSql } from "./modules/kusto.ts";
 import { ReadLine } from "./modules/readline.ts";
-import { PGlite } from "@electric-sql/pglite";
+//import { PGlite } from "npm:@electric-sql/pglite";
 
 import { deparse } from 'npm:pgsql-deparser';
 
@@ -22,13 +22,44 @@ const _db = new Kusto.Language.Symbols.DatabaseSymbol.$ctor2("db", null, [t1, t2
 
 const globalState = Kusto.Language.GlobalState.Default?.WithDatabase(_db);
 
+/* 
 const pgdb = new PGlite();
+await pgdb.exec(`
+    create table Z(a: string, b: string);
+    insert into Z VALUES ('test','123'), ('bcd', '456')`
+)
 
-function processLine(line: string): string {
+await pgdb.exec(`
+    create table Y(a: string, b: string);
+    insert into Y VALUES ('test','123'), ('bcd', '456')`
+)
+*/
+
+async function queryPg(query: string): Promise<string> {
+    /* disable till can debug pg_lite
+        error: Uncaught (in promise) error: syntax error at or near ":"
+        at ye.Ce (file:///root/.cache/deno/npm/registry.npmjs.org/@electric-sql/pglite/0.2.10/dist/chunk-AOCDFDRO.js:1:12465)
+        at ye.je (file:///root/.cache/deno/npm/registry.npmjs.org/@electric-sql/pglite/0.2.10/dist/chunk-AOCDFDRO.js:1:9851)
+        at ye.parse (file:///root/.cache/deno/npm/registry.npmjs.org/@electric-sql/pglite/0.2.10/dist/chunk-AOCDFDRO.js:1:8603)
+        at H.execProtocol (file:///root/.cache/deno/npm/registry.npmjs.org/@electric-sql/pglite/0.2.10/dist/index.js:1:6241)
+        at eventLoopTick (ext:core/01_core.js:175:7)
+        at async H.o (file:///root/.cache/deno/npm/registry.npmjs.org/@electric-sql/pglite/0.2.10/dist/chunk-PKPYJS5H.js:8:1263)
+        at async file:///root/.cache/deno/npm/registry.npmjs.org/@electric-sql/pglite/0.2.10/dist/chunk-PKPYJS5H.js:8:2229
+    */
+
+        /*
+         const result = await pgdb.query(query);
+        return `output: ${result.rows}`
+        */
+
+    return ""
+}
+
+async function processLine(line: string): Promise<string> {
     const [keyword, ...queryParts] = line.split(" ")
     const query = queryParts.join(" ")
 
-    if(keyword === "quit" || keyword === "q") {
+    if(keyword === "exit" || keyword === "x") {
       
 
         Deno.exit(0)
@@ -59,6 +90,27 @@ function processLine(line: string): string {
         }
 
         printKustoTree(parsed?.Syntax!)
+    } else if (keyword === "query" || keyword === "q") {
+        try {
+            const parsed = K.KustoCode.ParseAndAnalyze(query, globalState)
+
+            if(parsed?.GetDiagnostics()?.Count! > 0) {
+                //console.log("errors:", parsed?.GetDiagnostics()?.getItem(0).Message)
+            }
+
+            const sqlTree = transformKustoToSql(parsed?.Syntax!)
+
+           return await queryPg(deparse(sqlTree, {}))
+
+        } catch(ex) {
+            if(ex.message !== undefined) {
+                return ex.toString() 
+            } else {
+                return JSON.stringify(ex)
+            }
+        }
+    } else if (keyword == "query_sql" || keyword === "qs") {
+        return await queryPg(query)
     }
 
     return ""

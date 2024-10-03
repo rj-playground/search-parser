@@ -4,9 +4,9 @@
 // @generated from file pg_query.proto (package pg_query, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "npm:@bufbuild/protobuf/codegenv1";
-import { enumDesc, fileDesc, messageDesc } from "npm:@bufbuild/protobuf/codegenv1";
-import type { Message } from "npm:@bufbuild/protobuf";
+import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
+import type { Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file pg_query.proto.

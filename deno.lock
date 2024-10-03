@@ -2,12 +2,41 @@
   "version": "3",
   "packages": {
     "specifiers": {
+      "jsr:@std/bytes@^1.0.2": "jsr:@std/bytes@1.0.2",
+      "jsr:@std/encoding": "jsr:@std/encoding@1.0.5",
+      "jsr:@std/io": "jsr:@std/io@0.224.9",
+      "npm:@bufbuild/protobuf": "npm:@bufbuild/protobuf@2.1.0",
+      "npm:@electric-sql/pglite": "npm:@electric-sql/pglite@0.2.10",
+      "npm:@electric-sql/pglite@^0.2.9": "npm:@electric-sql/pglite@0.2.10",
       "npm:@kusto/language-service-next": "npm:@kusto/language-service-next@11.7.0",
       "npm:@pgsql/utils": "npm:@pgsql/utils@13.10.1",
+      "npm:@types/node": "npm:@types/node@18.16.19",
       "npm:bridge.net": "npm:bridge.net@2.0.0",
       "npm:pgsql-deparser": "npm:pgsql-deparser@13.15.0"
     },
+    "jsr": {
+      "@std/bytes@1.0.2": {
+        "integrity": "fbdee322bbd8c599a6af186a1603b3355e59a5fb1baa139f8f4c3c9a1b3e3d57"
+      },
+      "@std/encoding@1.0.5": {
+        "integrity": "ecf363d4fc25bd85bd915ff6733a7e79b67e0e7806334af15f4645c569fefc04"
+      },
+      "@std/io@0.224.9": {
+        "integrity": "4414664b6926f665102e73c969cfda06d2c4c59bd5d0c603fd4f1b1c840d6ee3",
+        "dependencies": [
+          "jsr:@std/bytes@^1.0.2"
+        ]
+      }
+    },
     "npm": {
+      "@bufbuild/protobuf@2.1.0": {
+        "integrity": "sha512-+2Mx67Y3skJ4NCD/qNSdBJNWtu6x6Qr53jeNg+QcwiL6mt0wK+3jwHH2x1p7xaYH6Ve2JKOVn0OxU35WsmqI9A==",
+        "dependencies": {}
+      },
+      "@electric-sql/pglite@0.2.10": {
+        "integrity": "sha512-0TJF/1ouBweCtyZC4oHwx+dHGn/lP16KfEO/3q22RDuZUsV2saTuYAwb6eK3gBLzVdXG4dj4xZilvmBYEM/WQg==",
+        "dependencies": {}
+      },
       "@kusto/language-service-next@11.7.0": {
         "integrity": "sha512-7m/COvVmcNdwCxwsoJFa18w9NMPJCAEyLFb7yzb4cUOUAhAo5yzmlSAezrTx7eTaBQpAdvFE6Eo7NuisakNqLQ==",
         "dependencies": {}
@@ -22,6 +51,10 @@
           "@pgsql/types": "@pgsql/types@13.9.0",
           "nested-obj": "nested-obj@0.0.1"
         }
+      },
+      "@types/node@18.16.19": {
+        "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
+        "dependencies": {}
       },
       "bridge.net@2.0.0": {
         "integrity": "sha512-DZCQ+whr07CpFCrHS02Njme+uvz+dNRt1K+eCXdZNuCSvIt+qlNHxelzeer1yxD5eW8q4pBHueUJ5o+uryyBYw==",
@@ -49,5 +82,16 @@
       }
     }
   },
-  "remote": {}
+  "redirects": {
+    "https://denopkg.com/chiefbiiko/base64/mod.ts": "https://denopkg.com/chiefbiiko/base64@master/mod.ts"
+  },
+  "remote": {
+    "https://denopkg.com/chiefbiiko/base64@master/base.ts": "47dc8d68f07dc91524bdd6db36eccbe59cf4d935b5fc09f27357a3944bb3ff7b",
+    "https://denopkg.com/chiefbiiko/base64@master/mod.ts": "1cbdc4ba7229d3c6d1763fecdb9d46844777c7e153abb6dabea8b0dd01448db4"
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:@electric-sql/pglite@^0.2.9"
+    ]
+  }
 }

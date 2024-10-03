@@ -1,8 +1,14 @@
-import { Node as ProtobufNode, } from './pg_query_pb.ts'
+import { ColumnRefSchema, NodeSchema, Node as ProtobufNode, } from './pg_query_pb.ts'
 
 import ast from 'npm:@pgsql/utils'
 
 import { createFromTypeName, KustASTTypeGuards } from "./typechecks.ts";
+import { toJsonString, create } from "npm:@bufbuild/protobuf";
+import { ColumnRef } from "./pg_query_pb.ts";
+import { toBinary } from "npm:@bufbuild/protobuf";
+
+import * as base64 from "jsr:@std/encoding/base64";
+
 
 function checkTypeProgrammatically(obj: any): string {
     for (const key in KustASTTypeGuards) {
@@ -50,7 +56,6 @@ export function toProto<T>(obj: T): ProtobufNode | undefined {
     return createFromTypeName(astType,result)
 }
 
-
 const s = toProto(
     ast.default.columnRef({
         fields: [
@@ -61,4 +66,25 @@ const s = toProto(
     })
 )
 
+
+const bin = toBinary(NodeSchema, create(NodeSchema, {node: {case: 'columnRef', value: s as ColumnRef}}))
+
+console.log(base64.encodeBase64(bin))
+
 console.log(s)
+
+
+
+Deno.test("Converting between pg typescript class and protobuf classes", () => {
+    const s = toProto(
+        ast.default.columnRef({
+            fields: [
+                ast.default.string({
+                    str: 'aasdad'
+                })
+            ]
+        })
+    )
+
+    console.log(JSON.stringify(s))
+})

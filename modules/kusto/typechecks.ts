@@ -475,7 +475,7 @@ export function createFromTypeName(astType: string, value: any): ProtoType.Node 
     if(astType === "ScanResult") { return create(ProtoType.ScanResultSchema, value)  }
     if(astType === "Integer") { return create(ProtoType.IntegerSchema, value)  }
     if(astType === "Float") { return create(ProtoType.FloatSchema, value)  }
-    if(astType === "String") { return create(ProtoType.StringSchema, value)  }
+    if(astType === "String") { return create(ProtoType.StringSchema, { sval: value['str'], ...value  } )  }
     if(astType === "BitString") { return create(ProtoType.BitStringSchema, value)  }
     if(astType === "Null") { return create(ProtoType.NullSchema, value)  }
     if(astType === "List") { return create(ProtoType.ListSchema, value)  }

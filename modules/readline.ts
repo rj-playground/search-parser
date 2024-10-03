@@ -28,7 +28,7 @@ const RIGHT_SEQUENCE = [27, 91, 67]
 const history: Uint8Array[] = []
 let historicalLine = 0
 
-function transform(readline: ReadLine, chunk: Uint8Array, controller: TransformStreamDefaultController<Uint8Array>) {
+async function transform(readline: ReadLine, chunk: Uint8Array, controller: TransformStreamDefaultController<Uint8Array>) {
     let cntrl = false
 
     for(const unit of chunk) {
@@ -111,7 +111,7 @@ function transform(readline: ReadLine, chunk: Uint8Array, controller: TransformS
             const line = decoder.decode(lineEncoded)
             readline.state.currentPosition = 0
 
-            const output = readline.method(line)
+            const output = await readline.method(line)
             const outputEncoded = encoder.encode(output)
             
             controller.enqueue(outputEncoded)
@@ -135,11 +135,11 @@ type ReadLineState = {
 }
 
 export class ReadLine extends TransformStream {
-    method: (query: string) => string
+    method: (query: string) => Promise<string>
     state: ReadLineState
     public readonly PROMPT: Uint8Array
 
-    constructor(_method: (query: string) => string, prompt: string) {
+    constructor(_method: (query: string) => Promise<string>, prompt: string) {
         super({
             transform: (chunk, controller) => transform(this, chunk, controller)
         })
