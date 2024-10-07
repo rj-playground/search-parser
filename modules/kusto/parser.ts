@@ -109,6 +109,22 @@ function transformSelectExpression(node: K.Syntax.SyntaxElement) {
         return ast.default.aConst({
             val: ast.default.float({str: constRef.ConstantValue})
         })
+    } else if (node.Kind === KustoType.NameDeclaration) {
+        const nameDeclaration = node as K.Syntax.NameDeclaration 
+
+        return ast.default.columnRef({
+            fields: [
+                ast.default.string({
+                    str: nameDeclaration.Name?.ToString(K.Syntax.IncludeTrivia.Minimal)
+                })
+            ]
+        })
+    } else if (node.Kind === KustoType.StringLiteralExpression) {
+        const literal = node as K.Syntax.LiteralExpression
+
+        return ast.default.aConst({
+            val: ast.default.string({str: literal.LiteralValueInfo?.ValueText!})
+        })
     }
 
     throw {msg: `Translation only supports name reference in select. Kind: ${syntaxNames[node.Kind]}`}
@@ -205,9 +221,25 @@ function transformFilter(filter: K.Syntax.FilterOperator): ast.Node  {
             lexpr,
             rexpr
         })
-    } 
+    } else if(filter.Condition?.Kind === KustoType.SimpleNamedExpression) {
+        const cond = filter.Condition as K.Syntax.SimpleNamedExpression
+
+        assert.equal(cond.EqualToken?.Kind, KustoType.EqualToken, `Only equal SimpleNamedExpression supported: ${syntaxNames[cond.EqualToken?.Kind!]}`)
+        
+        const lexpr = transformSelectExpression(cond.GetChild(0)!)
+        const rexpr = transformSelectExpression(cond.GetChild(2)!)
+        
+        const op = ast.default.string({str:"="})
+
+        return ast.default.aExpr({
+            kind: 'AEXPR_OP',
+            name: [op],
+            lexpr,
+            rexpr
+        })
+    }
     
-    throw {msg: `Filter of type ${syntaxNames[filter.Condition?.Kind!]} is not supported yet`} as ParseError
+    throw {msg: `Filter of type ${syntaxNames[filter.Condition?.Kind!]} is not supported yet, ${(filter.Condition as K.Syntax.SimpleNamedExpression).Name}`} as ParseError
 }
  
 export function transformKustoToSql(knode: K.Syntax.SyntaxNode | K.Syntax.SyntaxElement): ast.Node {

@@ -475,7 +475,7 @@ export function createFromTypeName(astType: string, value: any): ProtoType.Node 
     if(astType === "ScanResult") { return create(ProtoType.ScanResultSchema, value)  }
     if(astType === "Integer") { return create(ProtoType.IntegerSchema, value)  }
     if(astType === "Float") { return create(ProtoType.FloatSchema, value)  }
-    if(astType === "String") { return create(ProtoType.StringSchema, { sval: value['str'], ...value  } )  }
+    if(astType === "String") { return create(ProtoType.StringSchema, { sval: value['String']['str'], ...value  } )  }
     if(astType === "BitString") { return create(ProtoType.BitStringSchema, value)  }
     if(astType === "Null") { return create(ProtoType.NullSchema, value)  }
     if(astType === "List") { return create(ProtoType.ListSchema, value)  }
@@ -644,11 +644,11 @@ export function createFromTypeName(astType: string, value: any): ProtoType.Node 
     if(astType === "AlterSubscriptionStmt") { return create(ProtoType.AlterSubscriptionStmtSchema, value)  }
     if(astType === "DropSubscriptionStmt") { return create(ProtoType.DropSubscriptionStmtSchema, value)  }
     if(astType === "CreateStatsStmt") { return create(ProtoType.CreateStatsStmtSchema, value)  }
-    if(astType === "AlterCollationStmt") { return create(ProtoType.AlterCollationStmtSchema, value)  }
+    if(astType === "AlterCollationStmt") { return create(ProtoType.Altpg_query.ColumnReferCollationStmtSchema, value)  }
     if(astType === "CallStmt") { return create(ProtoType.CallStmtSchema, value)  }
     if(astType === "AlterStatsStmt") { return create(ProtoType.AlterStatsStmtSchema, value)  }
     if(astType === "A_Expr") { return create(ProtoType.A_ExprSchema, value)  }
-    if(astType === "ColumnRef") { return create(ProtoType.ColumnRefSchema, value)  }
+    if(astType === "ColumnRef") { const k = {"fields":[{String: {sval: 'ad'}}]}; console.log('!!!', JSON.stringify(k)); return create(ProtoType.ColumnRefSchema, k)  }
     if(astType === "ParamRef") { return create(ProtoType.ParamRefSchema, value)  }
     if(astType === "A_Const") { return create(ProtoType.A_ConstSchema, value)  }
     if(astType === "FuncCall") { return create(ProtoType.FuncCallSchema, value)  }

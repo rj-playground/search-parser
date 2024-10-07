@@ -2,7 +2,6 @@ use pg_query::Node;
 use prost::Message;
 use serde::Deserialize;
 use base64::prelude::*;
-use serde_binary::{binary_stream::Endian, Deserializer};
 
 pub mod pg_query {
     include!("gen/pg_query.rs");
@@ -36,7 +35,7 @@ fn main() {
 
    d.as_ref().unwrap().encode(&mut buf).unwrap();
 
-  // assert_eq!(BASE64_STANDARD.encode(buf.clone()), "0gMNCgu6DwgKBmFhc2RhZA==");
+   assert_eq!(BASE64_STANDARD.encode(buf.clone()), "0gMNCgu6DwgKBmFhc2RhZA==");
    
 
    let base64 = "0gMNCgu6DwgKBmFhc2RhZA==";

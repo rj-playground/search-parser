@@ -9,6 +9,7 @@ import 'npm:bridge.net'
 import 'npm:@kusto/language-service-next';
 
 import K = Kusto.Language
+import { toProtoBinary } from "./modules/kusto/proto.ts";
 
 //const query = "T |  join kind=inner (Z) on a | join kind=inner (Y) on z | where a > 10.0"
 
@@ -35,6 +36,12 @@ await pgdb.exec(`
 )
 */
 
+const ffi = Deno.dlopen('db/target/debug/libdb.so',
+    {
+        "query": {parameters: ["buffer", "u32"], result: "void"}
+    }
+);
+
 async function queryPg(query: string): Promise<string> {
     /* disable till can debug pg_lite
         error: Uncaught (in promise) error: syntax error at or near ":"
@@ -60,8 +67,7 @@ async function processLine(line: string): Promise<string> {
     const query = queryParts.join(" ")
 
     if(keyword === "exit" || keyword === "x") {
-      
-
+        ffi.close()
         Deno.exit(0)
     } else if(keyword === "translate" || keyword === "t") {
         try {
@@ -100,7 +106,15 @@ async function processLine(line: string): Promise<string> {
 
             const sqlTree = transformKustoToSql(parsed?.Syntax!)
 
-           return await queryPg(deparse(sqlTree, {}))
+            const serialized = toProtoBinary(sqlTree)
+
+            console.log(deparse(sqlTree, {}), "\n")
+
+            ffi.symbols.query(serialized, serialized.length)
+            
+            return ""
+
+           //return await queryPg(deparse(sqlTree, {}))
 
         } catch(ex) {
             if(ex.message !== undefined) {
